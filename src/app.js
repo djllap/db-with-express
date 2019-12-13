@@ -5,8 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const winston = require('winston');
 const { NODE_ENV } = require('./config');
-const bookmarkRoutes = require('./bookmarkRoutes');
-const bookmarksService = require('./bookmarks-service');
+const bookmarkRoutes = require('./bookmarks/bookmarkRoutes');
 
 const logger = winston.createLogger({
   level: 'info',
@@ -43,7 +42,7 @@ app.use(function validateBearerToken(req, res, next) {
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
-// app.use(bookmarkRoutes);
+app.use(bookmarkRoutes);
 
 app.use(function errorHandler(error, req, res, next) {
   let response;
@@ -53,22 +52,6 @@ app.use(function errorHandler(error, req, res, next) {
     response = { message: error.message, error };
   }
   res.status(500).json(response);
-});
-
-app.get('/bookmarks', (req, res, next) => {
-  return bookmarksService.getAllBookmarks(req.app.get('db'))
-    .then(bookmarks => res.json(bookmarks))
-    .catch(next);
-});
-
-app.get('/bookmarks/:id', (req, res, next) => {
-  return bookmarksService.getBookmarkByID(req.app.get('db'), req.params.id)
-    .then(bookmark => {
-      if (!bookmark) {
-        return res.status(404).json({error: {message: 'article doesn\'t exist'}});
-      }
-      res.json(bookmark);
-    }).catch(next);
 });
 
 module.exports = app;

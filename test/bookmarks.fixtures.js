@@ -2,33 +2,45 @@ function makeBookmarks() {
   return [
     {
       id: 1,
-      title: 'site 1',
-      description: 'djrgrbrsgjsbsssdlsdjsgsjlkgsgs',
-      url: 'www.kjfg.com',
-      rating: 4
+      title: 'Thinkful',
+      url: 'https://www.thinkful.com',
+      description: 'Think outside the classroom',
+      rating: 5,
     },
     {
       id: 2,
-      title: 'site 2',
-      description: 'kjrbgwjbwslgjbsgslnbsglsnsgsngn',
-      url: 'www.12345.com',
-      rating: 3
+      title: 'Google',
+      url: 'https://www.google.com',
+      description: 'Where we find everything else',
+      rating: 4,
     },
     {
       id: 3,
-      title: 'site 3',
-      description: 'dgusafegfonlbnwsgfolikwgrwgwergwg',
-      url: 'www.0987656.com',
-      rating: 2
-    },
-    {
-      id: 4,
-      title: 'site 4',
-      description: 'lkrgjrbsljgleknaefliaegelib',
-      url: 'www.asdfgh.com',
-      rating: 1
+      title: 'MDN',
+      url: 'https://developer.mozilla.org',
+      description: 'The only place to find web documentation',
+      rating: 5,
     },
   ];
 };
 
-module.exports = makeBookmarks;
+function makeMalicious() {
+  const maliciousBookmark = {
+    id: 911,
+    title: 'Naughty naughty very naughty <script>alert("xss");</script>',
+    url: 'https://www.hackers.com',
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+    rating: 1,
+  }
+  const expectedBookmark = {
+    ...maliciousBookmark,
+    title: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`
+  }
+  return {
+    maliciousBookmark,
+    expectedBookmark,
+  }
+}
+
+module.exports = { makeBookmarks, makeMalicious };
