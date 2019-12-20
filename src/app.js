@@ -42,7 +42,7 @@ app.use(function validateBearerToken(req, res, next) {
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
-app.use(bookmarkRoutes);
+app.use('/api', bookmarkRoutes);
 
 app.use(function errorHandler(error, req, res, next) {
   let response;

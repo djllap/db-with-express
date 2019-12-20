@@ -2,6 +2,7 @@ const express = require('express');
 const bookmarkRoutes = express.Router();
 const isURL = require('is-url');
 const winston = require('winston');
+const path = require('path');
 const bookmarksService = require('./bookmarks-service');
 const sanitizeBookmark = require('./sanitizeBookmark');
 const { NODE_ENV } = require('../config');
@@ -66,7 +67,7 @@ bookmarkRoutes.route('/bookmarks')
         logger.info(`Bookmark with id ${bookmark.id} created.`);
         res
           .status(201)
-          .location(`/bookmarks/${bookmark.id}`)
+          .location(path.posix.join(req.originalUrl, `/${bookmark.id}`))
           .json(sanitizeBookmark(bookmark));
       })
       .catch(next);
@@ -102,6 +103,27 @@ bookmarkRoutes.route('/bookmarks/:bookmark_id')
         res.status(204).end();
       })
       .catch(next);
+  })
+  .patch((req, res, next) => {
+    const {title, description, rating, url} = req.body;
+    const bookmarkToUpdate = {title, description, rating, url};
+    
+    const numberOfValues = Object.values(bookmarkToUpdate).filter(Boolean).length;
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: {
+          message: 'request must contain either title, url, description, or rating'
+        }
+      });
+    }
+
+    bookmarksService.updateBookmark(
+      req.app.get('db'),
+      req.params.bookmark_id,
+      bookmarkToUpdate
+    ).then(numRowsAffected => {
+      res.status(204).end();
+    }).catch(next);
   });
 
 module.exports = bookmarkRoutes;
